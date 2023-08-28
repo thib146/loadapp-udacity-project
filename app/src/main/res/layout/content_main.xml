@@ -9,14 +9,59 @@
     tools:context=".MainActivity"
     tools:showIn="@layout/activity_main">
 
+    <ImageView
+        android:id="@+id/main_screen_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/cloudBackground"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/baseline_cloud_download_192" />
+
+    <RadioButton
+        android:id="@+id/radio_button_glide"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/radio_button_glide_text"
+        android:textSize="@dimen/default_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/radio_button_loadapp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/main_screen_header" />
+
+    <RadioButton
+        android:id="@+id/radio_button_loadapp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/radio_button_loadapp_text"
+        android:textSize="@dimen/default_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/radio_button_retrofit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radio_button_glide" />
+
+    <RadioButton
+        android:id="@+id/radio_button_retrofit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:text="@string/radio_button_retrofit_text"
+        android:textSize="@dimen/default_text_size"
+        app:layout_constraintBottom_toTopOf="@+id/custom_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/radio_button_loadapp" />
+
     <com.udacity.LoadingButton
         android:id="@+id/custom_button"
         android:layout_width="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_height="60dp"
         android:layout_margin="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
