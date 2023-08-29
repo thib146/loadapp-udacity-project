@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import kotlin.properties.Delegates
@@ -15,7 +16,9 @@ class LoadingButton @JvmOverloads constructor(
     private var widthSize = 0
     private var heightSize = 0
 
-    private val valueAnimator = ValueAnimator()
+    private val rectA = RectF(0f, 0f, 0f, 0f)
+
+    private var valueAnimator = ValueAnimator()
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
 
@@ -32,7 +35,7 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     override fun performClick(): Boolean {
-        if (super.performClick()) return true
+        super.performClick()
 
         startLoadingAnimation()
 
@@ -45,6 +48,18 @@ class LoadingButton @JvmOverloads constructor(
         paint.color = resources.getColor(R.color.colorPrimary, null)
         canvas?.drawRect(width.toFloat(), height.toFloat(), 0f, 0f, paint)
 
+        paint.color = resources.getColor(R.color.colorPrimaryDark, null)
+        rectA.bottom = height.toFloat()
+        canvas?.drawRect(rectA, paint)
+
+        valueAnimator = ValueAnimator.ofFloat(0f, width.toFloat()).apply {
+            duration = 3000
+            addUpdateListener { updatedAnimation ->
+                rectA.right = updatedAnimation.animatedValue as Float
+                postInvalidate()
+            }
+        }
+
         paint.color = Color.WHITE
         val textResource = resources.getString(R.string.button_download)
         val textXPos = (width/2).toFloat()
@@ -53,7 +68,7 @@ class LoadingButton @JvmOverloads constructor(
     }
 
     private fun startLoadingAnimation() {
-
+        valueAnimator.start()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
