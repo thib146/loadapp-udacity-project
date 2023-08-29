@@ -29,10 +29,31 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
 
+        binding.lifecycleOwner = this
+
+        val glideRadioButton = binding.content.radioButtonGlide
+        val loadAppRadioButton = binding.content.radioButtonLoadapp
+        val retrofitRadioButton = binding.content.radioButtonRetrofit
+
+        glideRadioButton.setOnClickListener {
+            loadAppRadioButton.isChecked = false
+            retrofitRadioButton.isChecked = false
+        }
+
+        loadAppRadioButton.setOnClickListener {
+            glideRadioButton.isChecked = false
+            retrofitRadioButton.isChecked = false
+        }
+
+        retrofitRadioButton.setOnClickListener {
+            loadAppRadioButton.isChecked = false
+            glideRadioButton.isChecked = false
+        }
+
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         // TODO: Implement code below
-//        binding.custom_button.setOnClickListener {
+//        binding.content.customButton.setOnClickListener {
 //            download()
 //        }
     }

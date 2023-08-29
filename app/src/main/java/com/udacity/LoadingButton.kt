@@ -34,9 +34,10 @@ class LoadingButton @JvmOverloads constructor(
     override fun performClick(): Boolean {
         if (super.performClick()) return true
 
+        startLoadingAnimation()
+
         return true
     }
-
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
@@ -49,6 +50,10 @@ class LoadingButton @JvmOverloads constructor(
         val textXPos = (width/2).toFloat()
         val textYPos = (height/2).toFloat() - (paint.ascent()+paint.descent())/2
         canvas?.drawText(textResource, textXPos, textYPos, paint)
+    }
+
+    private fun startLoadingAnimation() {
+
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
