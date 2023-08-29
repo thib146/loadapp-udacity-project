@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.Uri
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import com.udacity.databinding.ActivityMainBinding
@@ -53,9 +54,14 @@ class MainActivity : AppCompatActivity() {
         registerReceiver(receiver, IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE))
 
         // TODO: Implement code below
-//        binding.content.customButton.setOnClickListener {
-//            download()
-//        }
+        binding.content.customButton.setOnClickListener {
+            if (!glideRadioButton.isChecked && !loadAppRadioButton.isChecked && !retrofitRadioButton.isChecked) {
+                Toast.makeText(this,
+                    getString(R.string.no_radio_button_selected_toast_message), Toast.LENGTH_SHORT).show()
+            } else {
+//                download()
+            }
+        }
     }
 
     private val receiver = object : BroadcastReceiver() {
