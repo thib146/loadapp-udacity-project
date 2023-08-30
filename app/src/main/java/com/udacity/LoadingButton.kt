@@ -16,9 +16,13 @@ class LoadingButton @JvmOverloads constructor(
     private var widthSize = 0
     private var heightSize = 0
 
-    private val rectA = RectF(0f, 0f, 0f, 0f)
+    private val loadingRect = RectF(0f, 0f, 0f, 0f)
+    private var circleRect = RectF(0f, 0f, 0f, 0f)
+    private var sweepAngle = 0f
+    private var textResource = resources.getString(R.string.button_download)
 
     private var valueAnimator = ValueAnimator()
+    private var valueAnimatorCircle = ValueAnimator()
 
     private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
 
@@ -49,26 +53,43 @@ class LoadingButton @JvmOverloads constructor(
         canvas?.drawRect(width.toFloat(), height.toFloat(), 0f, 0f, paint)
 
         paint.color = resources.getColor(R.color.colorPrimaryDark, null)
-        rectA.bottom = height.toFloat()
-        canvas?.drawRect(rectA, paint)
+        loadingRect.bottom = height.toFloat()
+        canvas?.drawRect(loadingRect, paint)
 
         valueAnimator = ValueAnimator.ofFloat(0f, width.toFloat()).apply {
             duration = 3000
             addUpdateListener { updatedAnimation ->
-                rectA.right = updatedAnimation.animatedValue as Float
+                loadingRect.right = updatedAnimation.animatedValue as Float
                 postInvalidate()
             }
         }
 
         paint.color = Color.WHITE
-        val textResource = resources.getString(R.string.button_download)
         val textXPos = (width/2).toFloat()
-        val textYPos = (height/2).toFloat() - (paint.ascent()+paint.descent())/2
+        val textYPos = (height/2).toFloat() - (paint.ascent() + paint.descent()) / 2
         canvas?.drawText(textResource, textXPos, textYPos, paint)
+
+        paint.color = resources.getColor(R.color.colorAccent, null)
+        circleRect.apply {
+            left = width * 0.75f - 30f
+            top = (height/2).toFloat() - 30f
+            right = width * 0.75f + 30f
+            bottom = (height/2).toFloat() + 30f
+        }
+
+        canvas?.drawArc(circleRect, 0f, sweepAngle, true, paint)
+        valueAnimatorCircle = ValueAnimator.ofFloat(0f, 360f).apply {
+            duration = 3000
+            addUpdateListener { updatedAnimation ->
+                sweepAngle = updatedAnimation.animatedValue as Float
+                postInvalidate()
+            }
+        }
     }
 
     private fun startLoadingAnimation() {
         valueAnimator.start()
+        valueAnimatorCircle.start()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {

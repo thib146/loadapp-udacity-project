@@ -10,6 +10,7 @@
 
     <string name="button_name">Click me</string>
     <string name="button_download">Download</string>
+    <string name="button_downloading">Downloading&#8230;</string>
     <string name="button_loading">We are loading </string>
     <string name="title_activity_detail">DetailActivity</string>
 
