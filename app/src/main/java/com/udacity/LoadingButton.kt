@@ -1,5 +1,7 @@
 package com.udacity
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -24,8 +26,20 @@ class LoadingButton @JvmOverloads constructor(
     private var valueAnimator = ValueAnimator()
     private var valueAnimatorCircle = ValueAnimator()
 
-    private var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
-
+    private var buttonState: ButtonState by Delegates.observable(ButtonState.Completed) { p, old, new ->
+        when (buttonState) {
+            ButtonState.Clicked -> {
+                textResource = resources.getString(R.string.button_downloading)
+                isClickable = false
+                startLoadingAnimation()
+            }
+            ButtonState.Loading -> { }
+            ButtonState.Completed -> {
+                textResource = resources.getString(R.string.button_download)
+                isClickable = true
+                resetLoadingAnimation()
+            }
+        }
     }
 
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
@@ -40,9 +54,7 @@ class LoadingButton @JvmOverloads constructor(
 
     override fun performClick(): Boolean {
         super.performClick()
-
-        startLoadingAnimation()
-
+        buttonState = ButtonState.Clicked
         return true
     }
 
@@ -62,6 +74,11 @@ class LoadingButton @JvmOverloads constructor(
                 loadingRect.right = updatedAnimation.animatedValue as Float
                 postInvalidate()
             }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    buttonState = ButtonState.Completed
+                }
+            })
         }
 
         paint.color = Color.WHITE
@@ -84,12 +101,22 @@ class LoadingButton @JvmOverloads constructor(
                 sweepAngle = updatedAnimation.animatedValue as Float
                 postInvalidate()
             }
+            addListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    buttonState = ButtonState.Completed
+                }
+            })
         }
     }
 
     private fun startLoadingAnimation() {
         valueAnimator.start()
         valueAnimatorCircle.start()
+    }
+
+    private fun resetLoadingAnimation() {
+        loadingRect.right = 0f
+        sweepAngle = 0f
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -104,5 +131,4 @@ class LoadingButton @JvmOverloads constructor(
         heightSize = h
         setMeasuredDimension(w, h)
     }
-
 }
