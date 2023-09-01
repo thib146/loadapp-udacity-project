@@ -2,6 +2,7 @@ package com.udacity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
@@ -10,6 +11,8 @@ import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -23,17 +26,24 @@ class LoadingButton @JvmOverloads constructor(
     private var sweepAngle = 0f
     private var textResource = resources.getString(R.string.button_download)
 
-    private var valueAnimator = ValueAnimator()
-    private var valueAnimatorCircle = ValueAnimator()
+    private var valueAnimatorFirstHalf = ValueAnimator()
+    private var valueAnimatorSecondHalf = ValueAnimator()
+    private var valueAnimatorCircleFirstHalf = ValueAnimator()
+    private var valueAnimatorCircleSecondHalf = ValueAnimator()
+    private val setFirstHalf = AnimatorSet()
+    private val setSecondHalf = AnimatorSet()
 
-    private var buttonState: ButtonState by Delegates.observable(ButtonState.Completed) { p, old, new ->
+    var buttonState: ButtonState by Delegates.observable(ButtonState.Completed) { p, old, new ->
         when (buttonState) {
             ButtonState.Clicked -> {
                 textResource = resources.getString(R.string.button_downloading)
                 isClickable = false
                 startLoadingAnimation()
             }
-            ButtonState.Loading -> { }
+            ButtonState.Loading -> {
+                isClickable = false
+                finishLoadingAnimation()
+            }
             ButtonState.Completed -> {
                 textResource = resources.getString(R.string.button_download)
                 isClickable = true
@@ -68,18 +78,23 @@ class LoadingButton @JvmOverloads constructor(
         loadingRect.bottom = height.toFloat()
         canvas?.drawRect(loadingRect, paint)
 
-        valueAnimator = ValueAnimator.ofFloat(0f, width.toFloat()).apply {
+        valueAnimatorFirstHalf = ValueAnimator.ofFloat(0f, width.toFloat() * 0.8f).apply {
+            duration = 30000
+            addUpdateListener { updatedAnimation ->
+                loadingRect.right = updatedAnimation.animatedValue as Float
+                postInvalidate()
+            }
+        }
+        valueAnimatorFirstHalf.interpolator = DecelerateInterpolator(1f)
+
+        valueAnimatorSecondHalf = ValueAnimator.ofFloat(loadingRect.right, width.toFloat()).apply {
             duration = 3000
             addUpdateListener { updatedAnimation ->
                 loadingRect.right = updatedAnimation.animatedValue as Float
                 postInvalidate()
             }
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    buttonState = ButtonState.Completed
-                }
-            })
         }
+        valueAnimatorSecondHalf.interpolator = AccelerateInterpolator(2f)
 
         paint.color = Color.WHITE
         val textXPos = (width/2).toFloat()
@@ -95,23 +110,42 @@ class LoadingButton @JvmOverloads constructor(
         }
 
         canvas?.drawArc(circleRect, 0f, sweepAngle, true, paint)
-        valueAnimatorCircle = ValueAnimator.ofFloat(0f, 360f).apply {
+        valueAnimatorCircleFirstHalf = ValueAnimator.ofFloat(0f, 270f).apply {
+            duration = 30000
+            addUpdateListener { updatedAnimation ->
+                sweepAngle = updatedAnimation.animatedValue as Float
+                postInvalidate()
+            }
+        }
+        valueAnimatorCircleFirstHalf.interpolator = DecelerateInterpolator(1f)
+
+        valueAnimatorCircleSecondHalf = ValueAnimator.ofFloat(sweepAngle, 360f).apply {
             duration = 3000
             addUpdateListener { updatedAnimation ->
                 sweepAngle = updatedAnimation.animatedValue as Float
                 postInvalidate()
             }
+        }
+        valueAnimatorCircleSecondHalf.interpolator = AccelerateInterpolator(2f)
+    }
+
+    private fun startLoadingAnimation() {
+        setFirstHalf.playTogether(valueAnimatorFirstHalf, valueAnimatorCircleFirstHalf)
+        setFirstHalf.start()
+    }
+
+    private fun finishLoadingAnimation() {
+        setFirstHalf.end()
+
+        setSecondHalf.apply {
+            playTogether(valueAnimatorSecondHalf, valueAnimatorCircleSecondHalf)
             addListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
                     buttonState = ButtonState.Completed
                 }
             })
+            start()
         }
-    }
-
-    private fun startLoadingAnimation() {
-        valueAnimator.start()
-        valueAnimatorCircle.start()
     }
 
     private fun resetLoadingAnimation() {
