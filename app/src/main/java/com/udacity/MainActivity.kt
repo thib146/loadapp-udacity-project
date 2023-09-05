@@ -1,17 +1,22 @@
 package com.udacity
 
 import android.app.DownloadManager
+import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.graphics.Color
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.udacity.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -26,11 +31,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
 
+    private val NOTIFICATION_ID = 146
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+
+        createChannel(
+            getString(R.string.download_notification_channel_id),
+            getString(R.string.download_notification_channel_name)
+        )
 
         binding.lifecycleOwner = this
 
@@ -72,7 +84,40 @@ class MainActivity : AppCompatActivity() {
         override fun onReceive(context: Context?, intent: Intent?) {
             val id = intent?.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1)
 
+            // Finish the loading button animation
             binding.content.customButton.buttonState = ButtonState.Loading
+
+            // Send a notification to the user
+            val contentIntent = Intent(applicationContext, DetailActivity::class.java)
+            pendingIntent = PendingIntent.getActivity(
+                applicationContext,
+                NOTIFICATION_ID,
+                contentIntent,
+                FLAG_IMMUTABLE
+            )
+
+            // Build the notification
+            val builder = NotificationCompat.Builder(
+                applicationContext,
+                applicationContext.getString(R.string.download_notification_channel_id)
+            )
+                .setSmallIcon(R.drawable.ic_assistant_black_24dp)
+                .setContentTitle(applicationContext.getString(R.string.notification_title))
+                .setContentText(getString(R.string.notification_description))
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+                .addAction(
+                    R.drawable.ic_assistant_black_24dp,
+                    applicationContext.getString(R.string.notification_button),
+                    pendingIntent
+                )
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+
+            notificationManager = ContextCompat.getSystemService(
+                context!!,
+                NotificationManager::class.java
+            ) as NotificationManager
+            notificationManager.notify(NOTIFICATION_ID, builder.build())
         }
     }
 
@@ -88,6 +133,29 @@ class MainActivity : AppCompatActivity() {
         val downloadManager = getSystemService(DOWNLOAD_SERVICE) as DownloadManager
         downloadID =
             downloadManager.enqueue(request)// enqueue puts the download request in the queue.
+    }
+
+    private fun createChannel(channelId: String, channelName: String) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val notificationChannel = NotificationChannel(
+                channelId,
+                channelName,
+                NotificationManager.IMPORTANCE_HIGH
+            )
+                .apply {
+                    setShowBadge(false)
+                }
+
+            notificationChannel.enableLights(true)
+            notificationChannel.lightColor = Color.RED
+            notificationChannel.enableVibration(true)
+            notificationChannel.description = "Download complete"
+
+            val notificationManager = getSystemService(
+                NotificationManager::class.java
+            )
+            notificationManager.createNotificationChannel(notificationChannel)
+        }
     }
 
     companion object {
