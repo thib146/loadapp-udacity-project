@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.constraintlayout.motion.widget.MotionLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layoutDescription="@xml/detail_motion"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context=".DetailActivity"
     tools:showIn="@layout/activity_detail">
@@ -14,11 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/default_text_size"
-        android:text="@string/file_name_title_text"
-        android:layout_marginTop="48dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        android:text="@string/file_name_title_text"/>
 
     <TextView
         android:id="@+id/file_name_content"
@@ -26,22 +23,14 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/default_text_size"
         android:textColor="@color/colorPrimaryDark"
-        tools:text="Glide - Image Loading Library by BumpTech:"
-        android:layout_marginTop="48dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        tools:text="Glide - Image Loading Library by BumpTech:" />
 
     <TextView
         android:id="@+id/status_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="@dimen/default_text_size"
-        android:text="@string/status_title_text"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/file_name_content"/>
+        android:text="@string/status_title_text"/>
 
     <TextView
         android:id="@+id/status_content"
@@ -49,11 +38,7 @@
         android:layout_height="wrap_content"
         android:textSize="@dimen/default_text_size"
         android:textColor="@color/colorPrimaryDark"
-        tools:text="Success"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/file_name_content"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        tools:text="Success"/>
 
     <Button
         android:id="@+id/detail_screen_ok_button"
@@ -63,9 +48,6 @@
         android:text="@string/detail_screen_ok_button_text"
         android:textColor="@color/white"
         android:textSize="@dimen/default_text_size"
-        android:layout_margin="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        android:layout_margin="20dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>

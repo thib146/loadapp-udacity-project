@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var downloadManager: DownloadManager
     private lateinit var notificationManager: NotificationManager
-//    private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
 
     private val NOTIFICATION_ID = 146
