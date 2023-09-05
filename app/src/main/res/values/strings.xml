@@ -23,4 +23,7 @@
 
     <string name="download_success_text">Success</string>
     <string name="download_fail_text">Fail</string>
+    <string name="file_name_title_text">File name:</string>
+    <string name="status_title_text">Status:</string>
+    <string name="detail_screen_ok_button_text">OK</string>
 </resources>

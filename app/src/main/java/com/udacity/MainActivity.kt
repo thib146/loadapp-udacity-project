@@ -4,7 +4,6 @@ import android.app.DownloadManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
-import android.app.PendingIntent.FLAG_IMMUTABLE
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
@@ -26,10 +25,11 @@ class MainActivity : AppCompatActivity() {
     private var downloadID: Long = 0
 
     private var urlSelected: String = ""
+    private var fileName: String = ""
 
     private lateinit var downloadManager: DownloadManager
     private lateinit var notificationManager: NotificationManager
-    private lateinit var pendingIntent: PendingIntent
+//    private lateinit var pendingIntent: PendingIntent
     private lateinit var action: NotificationCompat.Action
 
     private val NOTIFICATION_ID = 146
@@ -53,18 +53,21 @@ class MainActivity : AppCompatActivity() {
 
         glideRadioButton.setOnClickListener {
             urlSelected = URL_GLIDE_REPO
+            fileName = getString(R.string.radio_button_glide_text)
             loadAppRadioButton.isChecked = false
             retrofitRadioButton.isChecked = false
         }
 
         loadAppRadioButton.setOnClickListener {
             urlSelected = URL_LOADAPP_REPO
+            fileName = getString(R.string.radio_button_loadapp_text)
             glideRadioButton.isChecked = false
             retrofitRadioButton.isChecked = false
         }
 
         retrofitRadioButton.setOnClickListener {
             urlSelected = URL_RETROFIT_REPO
+            fileName = getString(R.string.radio_button_retrofit_text)
             loadAppRadioButton.isChecked = false
             glideRadioButton.isChecked = false
         }
@@ -91,7 +94,7 @@ class MainActivity : AppCompatActivity() {
             val status = getDownloadStatus(id)
 
             // Send a notification to the user
-            sendNotification(context, status)
+            sendNotification(context, status, fileName)
         }
     }
 
@@ -112,14 +115,17 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendNotification(context: Context?, status: String) {
+    private fun sendNotification(context: Context?, status: String, fileName: String) {
         val contentIntent = Intent(applicationContext, DetailActivity::class.java)
         contentIntent.putExtra(DOWNLOAD_STATUS, status)
-        pendingIntent = PendingIntent.getActivity(
+        contentIntent.putExtra(FILE_NAME, fileName)
+        contentIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+
+        val pendingIntent = PendingIntent.getActivity(
             applicationContext,
             NOTIFICATION_ID,
             contentIntent,
-            FLAG_IMMUTABLE
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
         // Build the notification
@@ -191,7 +197,8 @@ class MainActivity : AppCompatActivity() {
         private const val URL_RETROFIT_REPO =
             "https://github.com/square/retrofit/archive/refs/heads/master.zip"
 
-        private const val DOWNLOAD_STATUS = "downloadStatus"
+        const val DOWNLOAD_STATUS = "downloadStatus"
+        const val FILE_NAME = "fileName"
 
         private const val CHANNEL_ID = "channelId"
     }
