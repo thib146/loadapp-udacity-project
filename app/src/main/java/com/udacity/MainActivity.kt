@@ -12,11 +12,14 @@ import android.graphics.Color
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import com.udacity.databinding.ActivityMainBinding
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -74,6 +77,11 @@ class MainActivity : AppCompatActivity() {
 
         binding.content.customButton.setOnClickListener {
             if (!glideRadioButton.isChecked && !loadAppRadioButton.isChecked && !retrofitRadioButton.isChecked) {
+                Handler(Looper.getMainLooper()).postDelayed({
+                    // Finish the loading button animation
+                    binding.content.customButton.buttonState = ButtonState.Loading
+                }, 500)
+
                 Toast.makeText(this,
                     getString(R.string.no_radio_button_selected_toast_message), Toast.LENGTH_SHORT).show()
             } else {
@@ -185,6 +193,11 @@ class MainActivity : AppCompatActivity() {
             )
             notificationManager.createNotificationChannel(notificationChannel)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        unregisterReceiver(receiver)
     }
 
     companion object {

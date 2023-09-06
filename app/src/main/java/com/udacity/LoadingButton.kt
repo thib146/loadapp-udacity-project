@@ -4,15 +4,16 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
+import android.animation.ValueAnimator.INFINITE
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import androidx.core.content.withStyledAttributes
 import kotlin.properties.Delegates
 
 class LoadingButton @JvmOverloads constructor(
@@ -32,6 +33,11 @@ class LoadingButton @JvmOverloads constructor(
     private var valueAnimatorCircleSecondHalf = ValueAnimator()
     private val setFirstHalf = AnimatorSet()
     private val setSecondHalf = AnimatorSet()
+
+    private var textColor = 0
+    private var backgroundColor = 0
+    private var loadingBarColor = 0
+    private var loadingCircleColor = 0
 
     var buttonState: ButtonState by Delegates.observable(ButtonState.Completed) { p, old, new ->
         when (buttonState) {
@@ -60,6 +66,13 @@ class LoadingButton @JvmOverloads constructor(
 
     init {
         isClickable = true
+
+        context.withStyledAttributes(attrs, R.styleable.LoadingButton) {
+            textColor = getColor(R.styleable.LoadingButton_textColor, 0)
+            backgroundColor = getColor(R.styleable.LoadingButton_backgroundColor, 0)
+            loadingBarColor = getColor(R.styleable.LoadingButton_loadingBarColor, 0)
+            loadingCircleColor = getColor(R.styleable.LoadingButton_loadingCircleColor, 0)
+        }
     }
 
     override fun performClick(): Boolean {
@@ -71,10 +84,10 @@ class LoadingButton @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        paint.color = resources.getColor(R.color.colorPrimary, null)
+        paint.color = backgroundColor
         canvas?.drawRect(width.toFloat(), height.toFloat(), 0f, 0f, paint)
 
-        paint.color = resources.getColor(R.color.colorPrimaryDark, null)
+        paint.color = loadingBarColor
         loadingRect.bottom = height.toFloat()
         canvas?.drawRect(loadingRect, paint)
 
@@ -85,6 +98,7 @@ class LoadingButton @JvmOverloads constructor(
                 postInvalidate()
             }
         }
+        valueAnimatorFirstHalf.repeatCount = INFINITE
         valueAnimatorFirstHalf.interpolator = DecelerateInterpolator(1f)
 
         valueAnimatorSecondHalf = ValueAnimator.ofFloat(loadingRect.right, width.toFloat()).apply {
@@ -96,12 +110,12 @@ class LoadingButton @JvmOverloads constructor(
         }
         valueAnimatorSecondHalf.interpolator = AccelerateInterpolator(2f)
 
-        paint.color = Color.WHITE
+        paint.color = textColor
         val textXPos = (width/2).toFloat()
         val textYPos = (height/2).toFloat() - (paint.ascent() + paint.descent()) / 2
         canvas?.drawText(textResource, textXPos, textYPos, paint)
 
-        paint.color = resources.getColor(R.color.colorAccent, null)
+        paint.color = loadingCircleColor
         circleRect.apply {
             left = width * 0.75f - 30f
             top = (height/2).toFloat() - 30f
@@ -117,6 +131,7 @@ class LoadingButton @JvmOverloads constructor(
                 postInvalidate()
             }
         }
+        valueAnimatorCircleFirstHalf.repeatCount = INFINITE
         valueAnimatorCircleFirstHalf.interpolator = DecelerateInterpolator(1f)
 
         valueAnimatorCircleSecondHalf = ValueAnimator.ofFloat(sweepAngle, 360f).apply {
