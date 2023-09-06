@@ -29,7 +29,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var downloadManager: DownloadManager
     private lateinit var notificationManager: NotificationManager
-    private lateinit var action: NotificationCompat.Action
 
     private val NOTIFICATION_ID = 146
 
@@ -93,7 +92,7 @@ class MainActivity : AppCompatActivity() {
             val status = getDownloadStatus(id)
 
             // Send a notification to the user
-            sendNotification(context, status, fileName)
+            sendNotification(status, fileName)
         }
     }
 
@@ -114,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendNotification(context: Context?, status: String, fileName: String) {
+    private fun sendNotification(status: String, fileName: String) {
         val contentIntent = Intent(applicationContext, DetailActivity::class.java)
         contentIntent.putExtra(DOWNLOAD_STATUS, status)
         contentIntent.putExtra(FILE_NAME, fileName)
@@ -145,7 +144,7 @@ class MainActivity : AppCompatActivity() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
 
         notificationManager = ContextCompat.getSystemService(
-            context!!,
+            this,
             NotificationManager::class.java
         ) as NotificationManager
         notificationManager.notify(NOTIFICATION_ID, builder.build())
@@ -198,7 +197,5 @@ class MainActivity : AppCompatActivity() {
 
         const val DOWNLOAD_STATUS = "downloadStatus"
         const val FILE_NAME = "fileName"
-
-        private const val CHANNEL_ID = "channelId"
     }
 }
