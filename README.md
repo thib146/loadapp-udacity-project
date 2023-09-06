@@ -6,7 +6,7 @@ It showcases usage of advanced Android development: Custom Views, Property Anima
 
 # Features
 
-* The app proposes 3 github repository zip files to download
+* The app proposes 3 github repositories zip files to download
 * The app uses a custom view with property animations for the loading button (when the file is downloading)
 * The app sends a notification when the download is finished, with an action button. The notification opens the Detail Screen when tapped on
 * The app uses animations with MotionLayout in the Detail Screen
